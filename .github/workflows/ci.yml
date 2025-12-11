@@ -33,13 +33,15 @@ jobs:
       run: mvn -B package --file pom.xml
 
     - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@v5.0.0
+      uses: SonarSource/sonarqube-scan-action@v5.0.0
       with:
-        projectKey: ${{ env.SONAR_PROJECT_KEY }}
-        organization: ${{ env.SONAR_ORGANIZATION }}
-        token: ${{ secrets.SONAR_TOKEN }}
         args: >
-          -Dsonar.java.binaries=target
+         -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+         -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+         -Dsonar.host.url=https://sonarcloud.io
+         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+         -Dsonar.java.binaries=target
+
 
     - name: Build Docker image
       run: docker build -t springboot-app:latest .
