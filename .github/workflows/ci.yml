@@ -75,32 +75,33 @@ jobs:
           format: table
           severity: CRITICAL,HIGH
           exit-code: 0
-#==================================
-# STAGE 3: PUSH TO GITHUB PACKAGES
-#==================================
- push-image:
-  name: Push Docker Image to GHCR
-  runs-on: ubuntu-latest
-  needs: code-quality
 
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+  #==================================
+  # STAGE 3: PUSH TO GITHUB PACKAGES
+  #==================================
+  push-image:
+    name: Push Docker Image to GHCR
+    runs-on: ubuntu-latest
+    needs: code-quality
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: target-files
-        path: target/
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Login to GitHub Container Registry
-      run: echo ${{ secrets.GIT_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: target-files
+          path: target/
 
-    - name: Build Docker Image
-      run: docker build -t springboot-app:latest .
+      - name: Login to GitHub Container Registry
+        run: echo ${{ secrets.GIT_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Tag Docker Image
-      run: docker tag springboot-app:latest ghcr.io/${{ github.repository }}/springboot-app:latest
+      - name: Build Docker Image
+        run: docker build -t springboot-app:latest .
 
-    - name: Push Docker Image
-      run: docker push ghcr.io/${{ github.repository }}/springboot-app:latest
+      - name: Tag Docker Image
+        run: docker tag springboot-app:latest ghcr.io/${{ github.repository }}/springboot-app:latest
+
+      - name: Push Docker Image
+        run: docker push ghcr.io/${{ github.repository }}/springboot-app:latest
