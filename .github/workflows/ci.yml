@@ -43,7 +43,7 @@ jobs:
 
     env:
       SONAR_PROJECT_KEY: rahul-github-springboot_sprintbootservice-1
-      SONAR_ORGANIZATION: rahul-github
+      SONAR_ORGANIZATION: rahul-github-springboot
 
     steps:
       - name: Checkout Code
