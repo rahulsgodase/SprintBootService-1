@@ -42,7 +42,7 @@ jobs:
     needs: build
 
     env:
-      SONAR_PROJECT_KEY: rahul-github-springboot
+      SONAR_PROJECT_KEY: SprintBootService-1
       SONAR_ORGANIZATION: rahul-github
 
     steps:
