@@ -101,7 +101,7 @@ jobs:
         run: docker build -t springboot-app:latest .
 
       - name: Tag Docker Image
-        run: docker tag springboot-app:latest ghcr.io/${{ github.repository }}/springboot-app:latest
+        run: docker tag springboot-app:latest ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest
 
       - name: Push Docker Image
-        run: docker push ghcr.io/${{ github.repository }}/springboot-app:latest
+        run: docker push ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest
