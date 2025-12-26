@@ -1,4 +1,4 @@
-# Official OpenJDK 17 image 
+# Official OpenJDK 17 image  
 FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
