@@ -4,6 +4,18 @@ on:
   push:
     branches:
       - master
+  # This adds the "Run workflow" button in the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+        type: choice
+        options:
+          - info
+          - warning
+          - debugmaster
 
 jobs:
 
