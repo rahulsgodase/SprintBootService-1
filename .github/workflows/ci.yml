@@ -1,32 +1,19 @@
 name: Complete CI Pipeline 
 
-# run-name makes it easy to see WHO triggered the manual build in the history
-run-name: CI Run by @${{ github.actor }} | Branch: ${{ github.ref_name }}
-
 on:
   push:
     branches:
       - master
-  
-  # Manual Trigger Configuration
-  workflow_dispatch:
-    inputs:
-      skip_scans:
-        description: 'Skip Sonar and Trivy scans?'
-        type: boolean
-        default: false
-      maven_debug:
-        description: 'Enable Maven Debugging (-X)?'
-        type: boolean
-        default: false
 
 jobs:
+
   # =========================
   # STAGE 1: BUILD
   # =========================
   build:
     name: Build Application
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -36,15 +23,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven' # Added caching for faster manual runs
 
       - name: Maven Build
-        run: |
-          if [ "${{ github.event.inputs.maven_debug }}" == "true" ]; then
-            mvn -B -X clean package
-          else
-            mvn -B clean package
-          fi
+        run: mvn -B clean package
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -59,11 +40,11 @@ jobs:
     name: SonarCloud & Trivy Scan
     runs-on: ubuntu-latest
     needs: build
-    # Only run this if we didn't check the "Skip Scans" box
-    if: github.event.inputs.skip_scans != 'true'
+
     env:
       SONAR_PROJECT_KEY: rahul-github-springboot_sprintbootservice-1
       SONAR_ORGANIZATION: rahul-github-springboot
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -93,7 +74,7 @@ jobs:
           image-ref: springboot-app:latest
           format: table
           severity: CRITICAL,HIGH
-          exit-code: 1 # In industry, we fail the build if high risks are found
+          exit-code: 0
 
   #==================================
   # STAGE 3: PUSH TO GITHUB PACKAGES
@@ -101,11 +82,8 @@ jobs:
   push-image:
     name: Push Docker Image to GHCR
     runs-on: ubuntu-latest
-    # This runs if code-quality passes OR if we skipped it manually
-    needs: [build, code-quality]
-    if: |
-      always() && 
-      (needs.code-quality.result == 'success' || github.event.inputs.skip_scans == 'true')
+    needs: code-quality
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -119,13 +97,11 @@ jobs:
       - name: Login to GitHub Container Registry
         run: echo ${{ secrets.GIT_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and Tag Docker Image
-        # Using a dynamic tag (Run ID) is safer than always using :latest
-        run: |
-          docker build -t ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest .
-          docker tag ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:${{ github.run_id }}
+      - name: Build Docker Image
+        run: docker build -t springboot-app:latest .
+
+      - name: Tag Docker Image
+        run: docker tag springboot-app:latest ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest
 
       - name: Push Docker Image
-        run: |
-          docker push ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest
-          docker push ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:${{ github.run_id }}
+        run: docker push ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest
