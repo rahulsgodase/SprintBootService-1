@@ -13,6 +13,7 @@ jobs:
   start-runner:
     name: Start Spot Self Hosted Runner
     runs-on: ubuntu-latest
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -25,11 +26,10 @@ jobs:
         run: |
           aws autoscaling set-desired-capacity \
             --auto-scaling-group-name git-runner-asg \
-            --desired-capacity 1 \
-            --honor-cooldown
+            --desired-capacity 1
 
-      - name: Wait 90 seconds for runner to come online
-        run: sleep 90
+      - name: Wait for runner to come online
+        run: sleep 120
 
 
   # =========================
@@ -104,9 +104,9 @@ jobs:
           exit-code: 0
 
 
-  #==================================
-  # STAGE 3: PUSH TO GITHUB PACKAGES
-  #==================================
+  # =========================
+  # STAGE 3: PUSH TO GHCR
+  # =========================
   push-image:
     name: Push Docker Image to GHCR
     needs: code-quality
@@ -133,3 +133,27 @@ jobs:
 
       - name: Push Docker Image
         run: docker push ghcr.io/rahulsgodase/sprintbootservice-1/springboot-app:latest
+
+
+  # =========================
+  # JOB 4: STOP RUNNER
+  # =========================
+  stop-runner:
+    name: Stop Spot Runner
+    if: always()
+    needs: push-image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Scale ASG to zero
+        run: |
+          aws autoscaling set-desired-capacity \
+            --auto-scaling-group-name git-runner-asg \
+            --desired-capacity 0
