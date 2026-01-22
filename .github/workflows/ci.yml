@@ -28,7 +28,6 @@ jobs:
             --desired-capacity 1 \
             --honor-cooldown
 
-      # ✅ Optional: Wait for runner registration (recommended)
       - name: Wait 90 seconds for runner to come online
         run: sleep 90
 
