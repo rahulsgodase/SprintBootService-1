@@ -25,7 +25,7 @@ jobs:
         run: |
           aws autoscaling set-desired-capacity \
             --auto-scaling-group-name git-runner-asg \
-            --desired-capacity 1 \
+            --desired-capacity 0 \
             --honor-cooldown
 
       # ✅ Optional: Wait for runner registration (recommended)
