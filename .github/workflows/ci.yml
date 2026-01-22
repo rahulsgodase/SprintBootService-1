@@ -95,6 +95,12 @@ jobs:
       - name: Build Docker Image
         run: docker build -t springboot-app:latest .
 
+      - name: Cleanup Docker before Trivy
+        run: |
+          docker system prune -af --volumes
+          docker builder prune -af
+          df -h
+
       - name: Trivy Scan Docker Image
         uses: aquasecurity/trivy-action@master
         with:
