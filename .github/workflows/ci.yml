@@ -92,10 +92,8 @@ jobs:
             -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
             -Dsonar.java.binaries=target
 
-      - name: Cleanup Docker before Trivy
+      - name: total memory uses
         run: |
-          docker system prune -af --volumes
-          docker builder prune -af
           df -h
 
       - name: Build Docker Image
