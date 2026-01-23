@@ -20,12 +20,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
+          aws-region: ap-south-1
 
       - name: Scale ASG to start runner
         run: |
           aws autoscaling set-desired-capacity \
-            --auto-scaling-group-name git-runner-asg \
+            --auto-scaling-group-name github-runner-asg \
             --desired-capacity 1
 
       - name: Wait for runner to come online
@@ -148,11 +148,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
+          aws-region: ap-south-1
 
       - name: Scale ASG to zero
         run: |
           aws autoscaling set-desired-capacity \
-            --auto-scaling-group-name git-runner-asg \
+            --auto-scaling-group-name github-runner-asg \
             --desired-capacity 0
       
