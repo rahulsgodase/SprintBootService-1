@@ -1,6 +1,6 @@
 name: Complete CI Pipeline
 
-on:
+on: 
   push:
     branches:
       - master
