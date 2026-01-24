@@ -5,7 +5,7 @@ on:
     branches:
       - master
 
-jobs:
+jobs: 
 
   # =========================
   # JOB 0: START SELF HOSTED RUNNER (SPOT EC2)
